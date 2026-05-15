@@ -1,6 +1,6 @@
-const CACHE_NAME = 'training-v6';
+const CACHE_NAME = 'training-v7';
 const ASSETS = [
-  './training_v6.html',
+  './training_v7.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -52,7 +52,7 @@ self.addEventListener('fetch', event => {
       }).catch(() => {
         // Offline fallback — return cached HTML for navigation requests
         if (event.request.mode === 'navigate') {
-          return caches.match('./training_v6.html');
+          return caches.match('./training_v7.html');
         }
       });
     })
