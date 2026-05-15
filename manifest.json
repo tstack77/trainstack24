@@ -1,8 +1,8 @@
 {
-  "name": "Training Program v6",
+  "name": "Training Program v7",
   "short_name": "Training",
   "description": "Row & Strength Protocol — Week A / Week B",
-  "start_url": "./training_v6.html",
+  "start_url": "./training_v7.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#080a0f",
