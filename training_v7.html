@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Schedule — v6</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rv:#00d4ff;--rt:#a78bfa;--rl:#34d399;--str:#ff6b35;--mini:#f59e0b;--stretch:#10b981;
+  --bg:#080a0f;--s1:#0f1219;--s2:#161b24;--text:#e2e8f0;--muted:#64748b;
+  --border:rgba(255,255,255,0.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;padding:32px 20px 80px;}
+.wrap{max-width:980px;margin:0 auto;}
+
+/* HEADER */
+.hdr{margin-bottom:44px;}
+.hdr-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.hdr h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,88px);line-height:.9;background:linear-gradient(130deg,#fff 30%,#4b5563);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.03em;}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:10px;font-weight:300;}
+
+/* LEGEND */
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:40px;}
+.leg{display:flex;align-items:center;gap:7px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;}
+.dot{width:7px;height:7px;border-radius:50%;}
+
+/* CALENDAR */
+.wk-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:32px;}
+@media(max-width:680px){.cal{grid-template-columns:repeat(4,1fr);}}
+.cd{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:11px 10px;min-height:96px;display:flex;flex-direction:column;gap:5px;}
+.cd.rv{border-color:rgba(0,212,255,.3);background:linear-gradient(160deg,rgba(0,212,255,.06),var(--s1));}
+.cd.rt{border-color:rgba(167,139,250,.3);background:linear-gradient(160deg,rgba(167,139,250,.06),var(--s1));}
+.cd.rl{border-color:rgba(52,211,153,.3);background:linear-gradient(160deg,rgba(52,211,153,.06),var(--s1));}
+.cd.st{border-color:rgba(255,107,53,.3);background:linear-gradient(160deg,rgba(255,107,53,.06),var(--s1));}
+.cd.rs{opacity:.45;}
+.cd-dn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
+.badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:3px;width:fit-content;}
+.badge.rv{background:rgba(0,212,255,.12);color:var(--rv);border:1px solid rgba(0,212,255,.2);}
+.badge.rt{background:rgba(167,139,250,.12);color:var(--rt);border:1px solid rgba(167,139,250,.2);}
+.badge.rl{background:rgba(52,211,153,.12);color:var(--rl);border:1px solid rgba(52,211,153,.2);}
+.badge.st{background:rgba(255,107,53,.12);color:var(--str);border:1px solid rgba(255,107,53,.2);}
+.badge.mn{background:rgba(245,158,11,.12);color:var(--mini);border:1px solid rgba(245,158,11,.2);font-size:7px;}
+.badge.rs{background:rgba(100,116,139,.1);color:var(--muted);border:1px solid rgba(100,116,139,.15);}
+.cd-name{font-size:11px;font-weight:500;line-height:1.3;}
+.cd-detail{font-size:10px;color:var(--muted);font-weight:300;line-height:1.4;}
+
+/* SECTION TITLES */
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.05em;margin:48px 0 8px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.sec-note{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:20px;}
+
+/* ROWING + MINI CARDS GRID */
+.row-wrap{display:flex;flex-direction:column;gap:16px;margin-bottom:8px;}
+.row-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:680px){.row-pair{grid-template-columns:1fr;}}
+
+/* ROW CARD */
+.rc{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;}
+.rc.rv{border-color:rgba(0,212,255,.22);}
+.rc.rt{border-color:rgba(167,139,250,.22);}
+.rc.rl{border-color:rgba(52,211,153,.22);}
+.rc-num{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.04em;line-height:1;}
+.rv .rc-num{color:var(--rv);} .rt .rc-num{color:var(--rt);} .rl .rc-num{color:var(--rl);}
+.rc-type{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;}
+.rv .rc-type{color:var(--rv);} .rt .rc-type{color:var(--rt);} .rl .rc-type{color:var(--rl);}
+.rc-occ{font-size:10px;color:var(--muted);font-weight:300;}
+.rc-target{font-family:'DM Mono',monospace;font-size:10px;padding:5px 8px;border-radius:5px;margin-top:auto;}
+.rv .rc-target{background:rgba(0,212,255,.07);color:var(--rv);}
+.rt .rc-target{background:rgba(167,139,250,.07);color:var(--rt);}
+.rl .rc-target{background:rgba(52,211,153,.07);color:var(--rl);}
+
+/* ROWING PHASE TABLE */
+.rc-phases{width:100%;border-collapse:collapse;margin-top:4px;}
+.rc-phases thead tr{border-bottom:1px solid rgba(255,255,255,0.08);}
+.rc-phases thead td{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:3px 5px 5px;}
+.rc-phases tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);}
+.rc-phases tbody tr:last-child{border-bottom:none;}
+.rc-phases td{padding:5px 5px;vertical-align:middle;line-height:1.35;}
+.ph-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;padding-right:6px !important;min-width:64px;}
+.rv .ph-label{color:rgba(0,212,255,.45);}
+.rt .ph-label{color:rgba(167,139,250,.45);}
+.rl .ph-label{color:rgba(52,211,153,.45);}
+.ph-desc{color:#64748b;font-size:10px;font-weight:300;}
+.ph-pace{font-family:'DM Mono',monospace;font-size:10px;white-space:nowrap;padding-left:6px !important;}
+.rv .ph-pace{color:var(--rv);} .rt .ph-pace{color:var(--rt);} .rl .ph-pace{color:var(--rl);}
+.ph-watts{font-family:'DM Mono',monospace;font-size:9px;color:#94a3b8;white-space:nowrap;padding-left:6px !important;}
+.ph-spm{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);white-space:nowrap;padding-left:6px !important;}
+.ph-hr{font-family:'DM Mono',monospace;font-size:9px;color:rgba(245,158,11,.7);white-space:nowrap;padding-left:6px !important;}
+.ph-repeat td{background:rgba(255,255,255,.025);}
+.ph-note{font-size:10px;color:var(--muted);font-weight:300;font-style:italic;padding:5px 0 0;border-top:1px solid rgba(255,255,255,.04);margin-top:2px;}
+
+/* MINI SESSION CARD */
+.mc{background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.18);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;}
+.mc-head{display:flex;align-items:baseline;justify-content:space-between;}
+.mc-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mini);}
+.mc-time{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);}
+.mc-note{font-size:10px;color:var(--muted);font-weight:300;font-style:italic;line-height:1.4;border-top:1px solid rgba(245,158,11,.1);padding-top:6px;}
+.mc ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.mc li{font-size:11px;color:#d4a84b;padding-left:12px;position:relative;line-height:1.4;}
+.mc li::before{content:'·';position:absolute;left:0;color:var(--mini);font-size:14px;top:-2px;}
+.mc-muscle{font-family:'DM Mono',monospace;font-size:8px;color:rgba(245,158,11,.5);margin-left:4px;}
+
+/* PACE TARGETS */
+.targets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:32px;}
+@media(max-width:580px){.targets{grid-template-columns:1fr;}}
+.tc{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.tc-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.tc-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.03em;line-height:1;margin-bottom:2px;}
+.tc-row{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;}
+.tc-row span{color:#94a3b8;}
+.tv .tc-val{color:var(--rv);} .tt .tc-val{color:var(--rt);} .tl .tc-val{color:var(--rl);}
+
+/* STRETCH CARD */
+.stretch-card{background:var(--s1);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:18px 20px;margin-bottom:20px;}
+.stretch-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--stretch);margin-bottom:14px;}
+.stretch-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;}
+@media(max-width:580px){.stretch-grid{grid-template-columns:1fr;}}
+.s-col-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.s-list{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.s-list li{display:flex;gap:6px;align-items:baseline;font-size:11px;line-height:1.4;}
+.s-n{font-family:'DM Mono',monospace;font-size:9px;color:rgba(16,185,129,.5);min-width:16px;}
+.s-name{color:var(--text);font-weight:400;}
+.s-d{color:var(--muted);font-weight:300;font-size:10px;}
+.s-add{color:var(--stretch) !important;}
+.s-div{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:rgba(16,185,129,.4);margin:8px 0 4px;padding-top:6px;border-top:1px solid rgba(16,185,129,.1);}
+
+/* STRENGTH CARDS */
+.str-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.str-grid{grid-template-columns:1fr;}}
+.sc{background:var(--s1);border:1px solid rgba(255,107,53,.18);border-radius:12px;overflow:hidden;}
+.sc-head{background:linear-gradient(135deg,rgba(255,107,53,.1),rgba(255,107,53,.02));padding:16px 18px 12px;border-bottom:1px solid rgba(255,107,53,.1);}
+.sc-row{display:flex;align-items:baseline;gap:10px;margin-bottom:3px;}
+.sc-letter{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--str);line-height:1;letter-spacing:.03em;}
+.sc-day{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;}
+.sc-focus{font-size:12px;color:#94a3b8;font-weight:300;}
+.sc-tag{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(16,185,129,.08);color:var(--stretch);border:1px solid rgba(16,185,129,.15);width:fit-content;margin-top:6px;}
+.sc-body{padding:14px 18px 18px;}
+.ss-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,107,53,.55);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.ss-lbl::after{content:'';flex:1;height:1px;background:rgba(255,107,53,.1);}
+.fin-lbl{color:rgba(255,107,53,.4) !important;}
+.cor-lbl{color:rgba(100,116,139,.5) !important;}
+.carry{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin:4px 0 10px;padding:2px 8px;background:rgba(255,255,255,.03);border-radius:3px;display:inline-block;border:1px solid var(--border);}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.ex-list li{display:flex;gap:8px;align-items:baseline;font-size:11px;line-height:1.4;}
+.ex-n{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,107,53,.4);min-width:16px;}
+.ex-name{color:var(--text);font-weight:400;}
+.ex-d{color:var(--muted);font-weight:300;font-size:10px;}
+.ex-new{color:rgba(0,212,255,.7);font-weight:400;}
+
+/* SUNDAY ROUTINE */
+.sun-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+@media(max-width:700px){.sun-grid{grid-template-columns:repeat(2,1fr);}}
+.phase{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.phase-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--stretch);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(16,185,129,.15);}
+.phase ul{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.phase li{font-size:11px;color:#94a3b8;padding-left:10px;position:relative;font-weight:300;line-height:1.4;}
+.phase li::before{content:'·';position:absolute;left:0;color:var(--stretch);font-size:12px;top:-1px;}
+.p-time{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);}
+
+/* FREQ */
+.freq{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-top:32px;}
+.freq h3{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.freq-sub{font-size:10px;color:var(--muted);font-weight:300;margin-bottom:16px;font-style:italic;}
+.freq-row{display:flex;gap:12px;margin-bottom:8px;align-items:baseline;}
+.freq-ct{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--str);min-width:34px;}
+.freq-ex{font-size:11px;color:#94a3b8;font-weight:300;line-height:1.6;}
+.freq-mini{color:rgba(245,158,11,.7);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-tag">v6 · Updated May 4, 2026 · 48M · 6'4" · Current cycle</div>
+  <h1>WEEK A<br>WEEK B</h1>
+  <div class="hdr-sub">6 Row · 6 Strength · 6 Mini · 2 Rest · Repeating · Row sequence: VO₂Max · LSS · VO₂Max · Threshold · LSS · Threshold</div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg"><span class="dot" style="background:var(--rv)"></span>VO₂Max Row</div>
+  <div class="leg"><span class="dot" style="background:var(--rt)"></span>Threshold Row</div>
+  <div class="leg"><span class="dot" style="background:var(--rl)"></span>Steady State</div>
+  <div class="leg"><span class="dot" style="background:var(--str)"></span>Strength</div>
+  <div class="leg"><span class="dot" style="background:var(--mini)"></span>Mini Session</div>
+  <div class="leg"><span class="dot" style="background:var(--stretch)"></span>Stretch</div>
+  <div class="leg"><span class="dot" style="background:var(--muted)"></span>Rest</div>
+</div>
+
+<!-- WEEK A CALENDAR -->
+<div class="wk-lbl">Week A</div>
+<div class="cal">
+  <div class="cd rs"><div class="cd-dn">Mon</div><div class="badge rs">Rest</div><div class="cd-name" style="color:var(--muted)">Full Recovery</div></div>
+  <div class="cd rv"><div class="cd-dn">Tue</div><div class="badge rv">Row 1</div><div class="badge mn">+ Mini</div><div class="cd-name">VO₂Max Sprints</div><div class="cd-detail">4–6 × 500m · sub-1:55</div></div>
+  <div class="cd st"><div class="cd-dn">Wed</div><div class="badge st">Str A</div><div class="cd-name">Hinge + Push</div><div class="cd-detail">~55 min · Clamshell</div></div>
+  <div class="cd st"><div class="cd-dn">Thu</div><div class="badge st">Str B</div><div class="cd-name">Pull + Light Lower</div><div class="cd-detail">~55 min · Donkey Kick</div></div>
+  <div class="cd rl"><div class="cd-dn">Fri</div><div class="badge rl">Row 2</div><div class="badge mn">+ Mini</div><div class="cd-name">Long Steady State</div><div class="cd-detail">10k · 2:10–2:12</div></div>
+  <div class="cd rv"><div class="cd-dn">Sat</div><div class="badge rv">Row 3</div><div class="badge mn">+ Mini</div><div class="cd-name">VO₂Max Sprints</div><div class="cd-detail">4–6 × 500m · sub-1:55</div></div>
+  <div class="cd rs"><div class="cd-dn">Sun</div><div class="badge rs">Rest</div><div class="cd-name" style="color:var(--muted)">Full Stretch 20–25 min</div></div>
+</div>
+
+<!-- WEEK B CALENDAR -->
+<div class="wk-lbl">Week B</div>
+<div class="cal">
+  <div class="cd st"><div class="cd-dn">Mon</div><div class="badge st">Str C</div><div class="cd-name">Full Body Power</div><div class="cd-detail">~55 min · Clamshell</div></div>
+  <div class="cd st"><div class="cd-dn">Tue</div><div class="badge st">Str D</div><div class="cd-name">Post Chain + Upper</div><div class="cd-detail">~55 min · Donkey Kick</div></div>
+  <div class="cd rt"><div class="cd-dn">Wed</div><div class="badge rt">Row 4</div><div class="badge mn">+ Mini</div><div class="cd-name">Threshold Intervals</div><div class="cd-detail">4×4 min · 2:05–2:07</div></div>
+  <div class="cd rl"><div class="cd-dn">Thu</div><div class="badge rl">Row 5</div><div class="badge mn">+ Mini</div><div class="cd-name">Long Steady State</div><div class="cd-detail">10k · 2:10–2:12</div></div>
+  <div class="cd st"><div class="cd-dn">Fri</div><div class="badge st">Str E</div><div class="cd-name">Power + Pull</div><div class="cd-detail">~55 min · Clamshell</div></div>
+  <div class="cd st"><div class="cd-dn">Sat</div><div class="badge st">Str F</div><div class="cd-name">Pull + Recovery</div><div class="cd-detail">~50 min · Donkey Kick</div></div>
+  <div class="cd rt"><div class="cd-dn">Sun</div><div class="badge rt">Row 6</div><div class="badge mn">+ Mini</div><div class="cd-name">Threshold Intervals</div><div class="cd-detail">4×4 min · 2:05–2:07</div></div>
+</div>
+
+<!-- DAILY STRETCH -->
+<div class="sec-title" style="color:var(--stretch);">DAILY WARM-UP STRETCH</div>
+<div class="sec-note">Completed before every session · ~10 min standard · ~14–15 min Tue & Thu (+spinal)</div>
+
+<div class="stretch-card">
+  <div class="stretch-title">All Sessions — Standard (~10 min)</div>
+  <div class="stretch-grid">
+    <div>
+      <div class="s-col-lbl">Upper Body + Spine</div>
+      <ul class="s-list">
+        <li><span class="s-n">1</span><span class="s-name">Neck Side Tilts</span><span class="s-d">&nbsp;10s/side</span></li>
+        <li><span class="s-n">2</span><span class="s-name">Chin Tucks</span><span class="s-d">&nbsp;10 reps</span></li>
+        <li><span class="s-n">3</span><span class="s-name">Cross-Body Arm Swings</span><span class="s-d">&nbsp;10 reps</span></li>
+        <li><span class="s-n">4</span><span class="s-name">Backward Arm Circles</span><span class="s-d">&nbsp;10 rotations (up-behind-down)</span></li>
+        <li><span class="s-n">5</span><span class="s-name">Hip Circles</span><span class="s-d">&nbsp;10 each direction</span></li>
+        <li><span class="s-n">6</span><span class="s-name">Thoracic Extension</span><span class="s-d">&nbsp;10 reps over chair/roller</span></li>
+        <li><span class="s-n">7</span><span class="s-name">Standing Toe Touch</span><span class="s-d">&nbsp;10s</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="s-col-lbl">Lower Body + Activation</div>
+      <ul class="s-list">
+        <li><span class="s-n">8</span><span class="s-name">Crossover Windmill Swings</span><span class="s-d">&nbsp;10 reps</span></li>
+        <li><span class="s-n">9</span><span class="s-name">Two-Handed Cross-Over Floor Touches</span><span class="s-d">&nbsp;10 reps</span></li>
+        <li><span class="s-n">10</span><span class="s-name">Kneeling Hip Flexor Stretch</span><span class="s-d">&nbsp;20s/side</span></li>
+        <li><span class="s-n">11</span><span class="s-name">Kneeling Hamstring Stretch</span><span class="s-d">&nbsp;30s/side</span></li>
+        <li><span class="s-n">12</span><span class="s-name">Clamshell (A/C/E days)</span><span class="s-d">&nbsp;2×15/side</span></li>
+        <li><span class="s-n">13</span><span class="s-name">Donkey Kick (B/D/F days)</span><span class="s-d">&nbsp;2×15/side</span></li>
+        <li><span class="s-n">14</span><span class="s-name">Ankle Circles</span><span class="s-d">&nbsp;10/side</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="stretch-card">
+  <div class="stretch-title" style="color:var(--stretch);">Tue & Thu Only — Add After Item 11 (~14–15 min total)</div>
+  <div class="stretch-grid">
+    <div>
+      <ul class="s-list">
+        <div class="s-div">+ Spinal Additions (items 12–14)</div>
+        <li><span class="s-n" style="color:var(--stretch);opacity:.7;">12</span><span class="s-name s-add">Cat-Cow</span><span class="s-d">&nbsp;10 reps @3s each</span></li>
+        <li><span class="s-n" style="color:var(--stretch);opacity:.7;">13</span><span class="s-name s-add">Thread the Needle</span><span class="s-d">&nbsp;5 reps/side @3s hold</span></li>
+        <li><span class="s-n" style="color:var(--stretch);opacity:.7;">14</span><span class="s-name s-add">Supine Spinal Twist</span><span class="s-d">&nbsp;45s/side</span></li>
+        <div class="s-div">Then continue standard 12–14</div>
+        <li><span class="s-n">15</span><span class="s-name">Clamshell / Donkey Kick</span><span class="s-d">&nbsp;2×15/side</span></li>
+        <li><span class="s-n">16</span><span class="s-name">Ankle Circles</span><span class="s-d">&nbsp;10/side</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="s-col-lbl">Why Tue & Thu</div>
+      <ul class="s-list" style="gap:10px;">
+        <li><span style="color:var(--stretch);font-family:'DM Mono',monospace;font-size:9px;">Cat-Cow</span><br><span style="color:var(--muted);">Resets full spinal wave after rowing or between strength days.</span></li>
+        <li><span style="color:var(--stretch);font-family:'DM Mono',monospace;font-size:9px;">Thread the Needle</span><br><span style="color:var(--muted);">Best thoracic rotation movement. Counteracts rowing flexion dominance.</span></li>
+        <li><span style="color:var(--stretch);font-family:'DM Mono',monospace;font-size:9px;">Supine Spinal Twist</span><br><span style="color:var(--muted);">Lumbar + thoracic decompression. Disk history protection.</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ROWING -->
+<div class="sec-title" style="color:var(--rv);">ROWING SESSIONS</div>
+<div class="sec-note">Complete daily stretch first · Pace is primary · HR is ceiling check only · W/bpm is progression metric · SPM = strokes per minute</div>
+
+<!-- PACE TARGETS -->
+<div class="targets">
+  <div class="tc tv">
+    <div class="tc-lbl">VO₂Max · R1 & R3</div>
+    <div class="tc-val">sub-1:55</div>
+    <div class="tc-row"><span>350W+</span></div>
+    <div class="tc-row"><span>26–28 SPM</span></div>
+    <div class="tc-row"><span>HR 175+ Whoop</span></div>
+  </div>
+  <div class="tc tt">
+    <div class="tc-lbl">Threshold · R4 & R6</div>
+    <div class="tc-val">2:05–2:07</div>
+    <div class="tc-row"><span>185–200W</span></div>
+    <div class="tc-row"><span>22–23 SPM</span></div>
+    <div class="tc-row"><span>HR 165–175</span></div>
+  </div>
+  <div class="tc tl">
+    <div class="tc-lbl">Steady State · R2 & R5</div>
+    <div class="tc-val">2:10–2:12</div>
+    <div class="tc-row"><span>157W</span></div>
+    <div class="tc-row"><span>20–22 SPM</span></div>
+    <div class="tc-row"><span>HR ceiling 155</span></div>
+  </div>
+</div>
+
+<div class="row-wrap">
+
+  <!-- R1 + MINI -->
+  <div class="row-pair">
+    <div class="rc rv">
+      <div><div class="rc-num">R1</div><div class="rc-type">VO₂Max Sprints</div><div class="rc-occ">Tuesday · Week A · after REST day</div></div>
+      <table class="rc-phases">
+        <thead><tr>
+          <td class="ph-label">Phase</td><td class="ph-desc">Description</td>
+          <td class="ph-pace">Pace</td><td class="ph-watts">Watts</td>
+          <td class="ph-spm">SPM</td><td class="ph-hr">HR / Time</td>
+        </tr></thead>
+        <tbody>
+          <tr><td class="ph-label rv">Warm-Up</td><td class="ph-desc">Easy paddle</td><td class="ph-pace">2:30+</td><td class="ph-watts">~70W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+          <tr><td class="ph-label rv">Build</td><td class="ph-desc">Arrive at working pace by end</td><td class="ph-pace">2:30→1:55</td><td class="ph-watts">70→350W</td><td class="ph-spm">↑</td><td class="ph-hr">7 min</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rv">Sprint ×4–6</td><td class="ph-desc">All-out 500m · start at 4, build to 6</td><td class="ph-pace">sub-1:55</td><td class="ph-watts">350W+</td><td class="ph-spm">26–28</td><td class="ph-hr">~1:50–1:54</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rv">Rest ×4–6</td><td class="ph-desc">Easy paddle · HR 120–130 before next sprint</td><td class="ph-pace">3:00–3:15</td><td class="ph-watts">60–70W</td><td class="ph-spm">18–20</td><td class="ph-hr">min 2 min</td></tr>
+          <tr><td class="ph-label rv">Cool-Down</td><td class="ph-desc">Easy paddle</td><td class="ph-pace">3:10–3:20</td><td class="ph-watts">50–60W</td><td class="ph-spm">18–19</td><td class="ph-hr">5 min</td></tr>
+        </tbody>
+      </table>
+      <div class="ph-note">Freshest day — push hardest here. Do not start next sprint until HR ≤130.</div>
+      <div class="rc-target">sub-1:55 · 350W+ · 26–28 SPM · HR 175+ Whoop</div>
+    </div>
+    <div class="mc">
+      <div class="mc-head"><span class="mc-title">Post-Row Mini · R1</span><span class="mc-time">~7 min</span></div>
+      <ul>
+        <li>DB Lateral Raise — 1×failure @12.5lbs <span class="mc-muscle">[lateral delts]</span></li>
+        <li>Arnold Press — 1×failure @20lbs <span class="mc-muscle">[anterior delts]</span></li>
+        <li>Bicep Curl Ladder — 30→25→20lbs continuous <span class="mc-muscle">[biceps]</span></li>
+        <li>Diamond Push-Up — 1×failure BW <span class="mc-muscle">[triceps]</span></li>
+      </ul>
+      <div class="mc-note">Str A follows Wed. All top-priority deficiency groups safe.</div>
+    </div>
+  </div>
+
+  <!-- R2 + MINI -->
+  <div class="row-pair">
+    <div class="rc rl">
+      <div><div class="rc-num">R2</div><div class="rc-type">Long Steady State</div><div class="rc-occ">Friday · Week A</div></div>
+      <table class="rc-phases">
+        <thead><tr>
+          <td class="ph-label">Phase</td><td class="ph-desc">Description</td>
+          <td class="ph-pace">Pace</td><td class="ph-watts">Watts</td>
+          <td class="ph-spm">SPM</td><td class="ph-hr">HR / Time</td>
+        </tr></thead>
+        <tbody>
+          <tr><td class="ph-label rl">Warm-Up</td><td class="ph-desc">Easy paddle · separate from 10k</td><td class="ph-pace">2:30+</td><td class="ph-watts">~70W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rl">10k Main</td><td class="ph-desc">Continuous · no kick · hold pace to end</td><td class="ph-pace">2:10–2:12</td><td class="ph-watts">157W</td><td class="ph-spm">20–22</td><td class="ph-hr">ceiling 155</td></tr>
+          <tr><td class="ph-label rl">Cool-Down</td><td class="ph-desc">Easy paddle · target end HR ≤120</td><td class="ph-pace">3:10–3:20</td><td class="ph-watts">50–60W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+        </tbody>
+      </table>
+      <div class="ph-note">Pace primary · HR ceiling check only · after Str B Thu</div>
+      <div class="rc-target">2:10–2:12 · 157W · 20–22 SPM · HR ceiling 155</div>
+    </div>
+    <div class="mc">
+      <div class="mc-head"><span class="mc-title">Post-Row Mini · R2</span><span class="mc-time">~5 min</span></div>
+      <ul>
+        <li>DB Lateral Raise — 1×failure @12.5lbs <span class="mc-muscle">[lateral delts]</span></li>
+        <li>Arnold Press — 1×failure @20lbs <span class="mc-muscle">[anterior delts]</span></li>
+        <li>Diamond Push-Up — 1×failure BW <span class="mc-muscle">[triceps]</span></li>
+      </ul>
+      <div class="mc-note">Str B yesterday hit biceps — skip biceps. Shoulders untouched since Wed. Triceps fresh.</div>
+    </div>
+  </div>
+
+  <!-- R3 + MINI -->
+  <div class="row-pair">
+    <div class="rc rv">
+      <div><div class="rc-num">R3</div><div class="rc-type">VO₂Max Sprints</div><div class="rc-occ">Saturday · Week A · pre-Sunday REST</div></div>
+      <table class="rc-phases">
+        <thead><tr>
+          <td class="ph-label">Phase</td><td class="ph-desc">Description</td>
+          <td class="ph-pace">Pace</td><td class="ph-watts">Watts</td>
+          <td class="ph-spm">SPM</td><td class="ph-hr">HR / Time</td>
+        </tr></thead>
+        <tbody>
+          <tr><td class="ph-label rv">Warm-Up</td><td class="ph-desc">Easy paddle</td><td class="ph-pace">2:30+</td><td class="ph-watts">~70W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+          <tr><td class="ph-label rv">Build</td><td class="ph-desc">Arrive at working pace by end</td><td class="ph-pace">2:30→1:55</td><td class="ph-watts">70→350W</td><td class="ph-spm">↑</td><td class="ph-hr">7 min</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rv">Sprint ×4–6</td><td class="ph-desc">All-out 500m · start at 4, build to 6</td><td class="ph-pace">sub-1:55</td><td class="ph-watts">350W+</td><td class="ph-spm">26–28</td><td class="ph-hr">~1:50–1:54</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rv">Rest ×4–6</td><td class="ph-desc">Easy paddle · HR 120–130 before next sprint</td><td class="ph-pace">3:00–3:15</td><td class="ph-watts">60–70W</td><td class="ph-spm">18–20</td><td class="ph-hr">min 2 min</td></tr>
+          <tr><td class="ph-label rv">Cool-Down</td><td class="ph-desc">Easy paddle</td><td class="ph-pace">3:10–3:20</td><td class="ph-watts">50–60W</td><td class="ph-spm">18–19</td><td class="ph-hr">5 min</td></tr>
+        </tbody>
+      </table>
+      <div class="ph-note">Sunday REST follows — 36hr recovery window. Do not start next sprint until HR ≤130.</div>
+      <div class="rc-target">sub-1:55 · 350W+ · 26–28 SPM · HR 175+ Whoop</div>
+    </div>
+    <div class="mc">
+      <div class="mc-head"><span class="mc-title">Post-Row Mini · R3</span><span class="mc-time">~8:30 — hardest mini</span></div>
+      <ul>
+        <li>Bicep Curl Ladder — 30→25→20lbs continuous <span class="mc-muscle">[biceps]</span></li>
+        <li>Hammer Curl — 1×failure @30lbs <span class="mc-muscle">[biceps]</span></li>
+        <li>DB Lateral Raise — 1×failure @12.5lbs <span class="mc-muscle">[lateral delts]</span></li>
+        <li>Arnold Press — 1×failure @20lbs <span class="mc-muscle">[anterior delts]</span></li>
+        <li>DB OH Tricep Extension — 1×failure @25lbs <span class="mc-muscle">[triceps]</span></li>
+      </ul>
+      <div class="mc-note">Sunday REST follows — 36hr recovery window. Double bicep hit justified. Hardest mini session.</div>
+    </div>
+  </div>
+
+  <!-- R4 + MINI -->
+  <div class="row-pair">
+    <div class="rc rt">
+      <div><div class="rc-num">R4</div><div class="rc-type">Threshold Intervals</div><div class="rc-occ">Wednesday · Week B</div></div>
+      <table class="rc-phases">
+        <thead><tr>
+          <td class="ph-label">Phase</td><td class="ph-desc">Description</td>
+          <td class="ph-pace">Pace</td><td class="ph-watts">Watts</td>
+          <td class="ph-spm">SPM</td><td class="ph-hr">HR / Time</td>
+        </tr></thead>
+        <tbody>
+          <tr><td class="ph-label rt">Warm-Up</td><td class="ph-desc">Easy paddle</td><td class="ph-pace">2:30+</td><td class="ph-watts">~70W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+          <tr><td class="ph-label rt">Build</td><td class="ph-desc">Arrive at 2:08 by end</td><td class="ph-pace">2:30→2:08</td><td class="ph-watts">70→185W</td><td class="ph-spm">↑ to 22</td><td class="ph-hr">7 min</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rt">Work ×4</td><td class="ph-desc">Threshold interval</td><td class="ph-pace">2:05–2:07</td><td class="ph-watts">185–200W</td><td class="ph-spm">22–23</td><td class="ph-hr">165–175 · 4 min</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rt">Paddle ×4</td><td class="ph-desc">Easy · HR ≤135 before next interval</td><td class="ph-pace">3:00–3:15</td><td class="ph-watts">60–70W</td><td class="ph-spm">18 max</td><td class="ph-hr">min 3 min</td></tr>
+          <tr><td class="ph-label rt">Cool-Down</td><td class="ph-desc">Easy paddle</td><td class="ph-pace">3:00+</td><td class="ph-watts">50–60W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+        </tbody>
+      </table>
+      <div class="ph-note">After Str D · same protocol as R6 · If HRV low → drop to 3×4 min</div>
+      <div class="rc-target">2:05–2:07 · 185–200W · 22–23 SPM · HR 165–175</div>
+    </div>
+    <div class="mc">
+      <div class="mc-head"><span class="mc-title">Post-Row Mini · R4</span><span class="mc-time">~5 min</span></div>
+      <ul>
+        <li>DB Lateral Raise — 1×failure @12.5lbs <span class="mc-muscle">[lateral delts]</span></li>
+        <li>Bicep Curl Ladder — 30→25→20lbs continuous <span class="mc-muscle">[biceps]</span></li>
+        <li>Diamond Push-Up — 1×failure BW <span class="mc-muscle">[triceps]</span></li>
+      </ul>
+      <div class="mc-note">Str D hit rear delts/back/legs. Lateral delts, biceps, triceps all untouched and safe.</div>
+    </div>
+  </div>
+
+  <!-- R5 + MINI -->
+  <div class="row-pair">
+    <div class="rc rl">
+      <div><div class="rc-num">R5</div><div class="rc-type">Long Steady State</div><div class="rc-occ">Thursday · Week B</div></div>
+      <table class="rc-phases">
+        <thead><tr>
+          <td class="ph-label">Phase</td><td class="ph-desc">Description</td>
+          <td class="ph-pace">Pace</td><td class="ph-watts">Watts</td>
+          <td class="ph-spm">SPM</td><td class="ph-hr">HR / Time</td>
+        </tr></thead>
+        <tbody>
+          <tr><td class="ph-label rl">Warm-Up</td><td class="ph-desc">Easy paddle · separate from 10k · +Spinal stretch Thu</td><td class="ph-pace">2:30+</td><td class="ph-watts">~70W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rl">10k Main</td><td class="ph-desc">Continuous · no kick · hold pace to end</td><td class="ph-pace">2:10–2:12</td><td class="ph-watts">157W</td><td class="ph-spm">20–22</td><td class="ph-hr">ceiling 155</td></tr>
+          <tr><td class="ph-label rl">Cool-Down</td><td class="ph-desc">Easy paddle · target end HR ≤120</td><td class="ph-pace">3:10–3:20</td><td class="ph-watts">50–60W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+        </tbody>
+      </table>
+      <div class="ph-note">Pace primary · HR ceiling check only · before Str E Fri — keep controlled</div>
+      <div class="rc-target">2:10–2:12 · 157W · 20–22 SPM · HR ceiling 155</div>
+    </div>
+    <div class="mc">
+      <div class="mc-head"><span class="mc-title">Post-Row Mini · R5</span><span class="mc-time">~4 min · conservative</span></div>
+      <ul>
+        <li>Bicep Curl Ladder — 30→25→20lbs continuous <span class="mc-muscle">[biceps]</span></li>
+        <li>SL Glute Bridge — 1×failure each side BW <span class="mc-muscle">[glutes light]</span></li>
+      </ul>
+      <div class="mc-note">Str E tomorrow uses shoulders/lats/chest/legs — protect all. 0 exercises also valid today.</div>
+    </div>
+  </div>
+
+  <!-- R6 + MINI -->
+  <div class="row-pair">
+    <div class="rc rt">
+      <div><div class="rc-num">R6</div><div class="rc-type">Threshold Intervals</div><div class="rc-occ">Sunday · Week B · into Mon Str C</div></div>
+      <table class="rc-phases">
+        <thead><tr>
+          <td class="ph-label">Phase</td><td class="ph-desc">Description</td>
+          <td class="ph-pace">Pace</td><td class="ph-watts">Watts</td>
+          <td class="ph-spm">SPM</td><td class="ph-hr">HR / Time</td>
+        </tr></thead>
+        <tbody>
+          <tr><td class="ph-label rt">Warm-Up</td><td class="ph-desc">Easy paddle</td><td class="ph-pace">2:30+</td><td class="ph-watts">~70W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+          <tr><td class="ph-label rt">Build</td><td class="ph-desc">Arrive at 2:08 by end</td><td class="ph-pace">2:30→2:08</td><td class="ph-watts">70→185W</td><td class="ph-spm">↑ to 22</td><td class="ph-hr">7 min</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rt">Work ×4</td><td class="ph-desc">Threshold interval</td><td class="ph-pace">2:05–2:07</td><td class="ph-watts">185–200W</td><td class="ph-spm">22–23</td><td class="ph-hr">165–175 · 4 min</td></tr>
+          <tr class="ph-repeat"><td class="ph-label rt">Paddle ×4</td><td class="ph-desc">Easy · HR ≤135 before next interval</td><td class="ph-pace">3:00–3:15</td><td class="ph-watts">60–70W</td><td class="ph-spm">18 max</td><td class="ph-hr">min 3 min</td></tr>
+          <tr><td class="ph-label rt">Cool-Down</td><td class="ph-desc">Easy paddle</td><td class="ph-pace">3:00+</td><td class="ph-watts">50–60W</td><td class="ph-spm">18–19</td><td class="ph-hr">2 min</td></tr>
+        </tbody>
+      </table>
+      <div class="ph-note">→ Monday Str C follows · If HRV low → drop to 3×4 min</div>
+      <div class="rc-target">2:05–2:07 · 185–200W · 22–23 SPM · HR 165–175</div>
+    </div>
+    <div class="mc">
+      <div class="mc-head"><span class="mc-title">Post-Row Mini · R6</span><span class="mc-time">~6 min</span></div>
+      <ul>
+        <li>DB Lateral Raise — 1×failure @12.5lbs <span class="mc-muscle">[lateral delts]</span></li>
+        <li>Arnold Press — 1×failure @20lbs <span class="mc-muscle">[anterior delts]</span></li>
+        <li>Diamond Push-Up — 1×failure BW <span class="mc-muscle">[triceps]</span></li>
+        <li>DB OH Tricep Extension — 1×failure @25lbs <span class="mc-muscle">[triceps]</span></li>
+      </ul>
+      <div class="mc-note">Str C Mon uses pull-ups/hinge/squat — shoulders and triceps safe tonight.</div>
+    </div>
+  </div>
+
+</div><!-- end row-wrap -->
+
+<!-- STRENGTH -->
+<div class="sec-title" style="color:var(--str);">STRENGTH SESSIONS</div>
+<div class="sec-note">Complete daily stretch before each session · Suitcase carry not in 14-item count · 3-sec eccentric on all compound lifts</div>
+
+<div class="str-grid">
+
+  <!-- A -->
+  <div class="sc">
+    <div class="sc-head">
+      <div class="sc-row"><div class="sc-letter">A</div><div><div class="sc-day">Wednesday · Week A</div><div class="sc-focus">Hinge + Push · ~55 min</div></div></div>
+      <div class="sc-tag">Warm-up: Clamshell · Carry: after SS1 + after SS3</div>
+    </div>
+    <div class="sc-body">
+      <ul class="ex-list"><li><span class="ex-n">1</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;2×100</span></li></ul>
+      <div class="ss-lbl">SS1</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">2</span><span class="ex-name">Push-Up</span><span class="ex-d">&nbsp;3×15</span></li>
+        <li><span class="ex-n">3</span><span class="ex-name">Single Arm DB Row</span><span class="ex-d">&nbsp;3×10/side @50lbs</span></li>
+        <li><span class="ex-n">4</span><span class="ex-name">Deadbug — Chest Press Var.</span><span class="ex-d">&nbsp;3×12/side @20lbs · press DB to chest as leg lowers</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl">SS2</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">5</span><span class="ex-name">DB Swing</span><span class="ex-d">&nbsp;3×15–20 @50lbs</span></li>
+        <li><span class="ex-n">6</span><span class="ex-name">Double DB RDL</span><span class="ex-d">&nbsp;3×10 @55lbs/arm</span></li>
+        <li><span class="ex-n">7</span><span class="ex-name">Bulgarian Split Squat</span><span class="ex-d">&nbsp;3×10/leg @10lbs/hand</span></li>
+      </ul>
+      <div class="ss-lbl">SS3</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">8</span><span class="ex-name">Double DB OHP</span><span class="ex-d">&nbsp;3×8–10 @30lbs/arm</span></li>
+        <li><span class="ex-n">9</span><span class="ex-name ex-new">Straight Arm DB Pullback</span><span class="ex-d">&nbsp;3×12–15 @10lbs/arm · hip hinge · arms fully extended</span></li>
+        <li><span class="ex-n">10</span><span class="ex-name">Rear Delt Fly</span><span class="ex-d">&nbsp;3×10 @12.5lbs/arm</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl fin-lbl">Finisher</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">11</span><span class="ex-name">Bicycle Crunches</span><span class="ex-d">&nbsp;3×20/side</span></li>
+        <li><span class="ex-n">12</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;3×100</span></li>
+      </ul>
+      <div class="ss-lbl cor-lbl">Corrective</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">13</span><span class="ex-name">Side-Lying Ext Rotation</span><span class="ex-d">&nbsp;3×8 @7.5lbs</span></li>
+        <li><span class="ex-n">14</span><span class="ex-name">Dead Hang</span><span class="ex-d">&nbsp;2×20s</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- B -->
+  <div class="sc">
+    <div class="sc-head">
+      <div class="sc-row"><div class="sc-letter">B</div><div><div class="sc-day">Thursday · Week A</div><div class="sc-focus">Pull + Light Lower · ~55 min</div></div></div>
+      <div class="sc-tag">Warm-up: Donkey Kick · +Spinal stretch (Thu) · Carry: after SS1 + pre-finisher</div>
+    </div>
+    <div class="sc-body">
+      <ul class="ex-list"><li><span class="ex-n">1</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;2×100</span></li></ul>
+      <div class="ss-lbl">SS1</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">2</span><span class="ex-name">Isometric Push-Up Hold</span><span class="ex-d">&nbsp;3×30–40s</span></li>
+        <li><span class="ex-n">3</span><span class="ex-name">Deadbug</span><span class="ex-d">&nbsp;3×12/side</span></li>
+        <li><span class="ex-n">4</span><span class="ex-name">SL Glute Bridge Alt</span><span class="ex-d">&nbsp;3×15/side @20lbs</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl">SS2</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">5</span><span class="ex-name">Pull-Ups</span><span class="ex-d">&nbsp;3×max (3-sec eccentric · B: 4/4/3 · C: 5/4/3)</span></li>
+        <li><span class="ex-n">6</span><span class="ex-name">Goblet Squat</span><span class="ex-d">&nbsp;3×10 @50lbs</span></li>
+        <li><span class="ex-n">7</span><span class="ex-name">Bicep Curl</span><span class="ex-d">&nbsp;3×10 @30lbs/arm</span></li>
+      </ul>
+      <div class="ss-lbl">SS3</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">8</span><span class="ex-name">Single Leg RDL</span><span class="ex-d">&nbsp;3×10/side @40lbs/arm</span></li>
+        <li><span class="ex-n">9</span><span class="ex-name">Bicycle Crunches</span><span class="ex-d">&nbsp;3×20/side</span></li>
+        <li><span class="ex-n">10</span><span class="ex-name">Prone Y Raise</span><span class="ex-d">&nbsp;3×12 @5lbs/arm</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl fin-lbl">Finisher</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">11</span><span class="ex-name">Crunches</span><span class="ex-d">&nbsp;3×30 · pillow under lower back for ROM</span></li>
+        <li><span class="ex-n">12</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;3×100</span></li>
+      </ul>
+      <div class="ss-lbl cor-lbl">Corrective</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">13</span><span class="ex-name">Scapular Push-Ups</span><span class="ex-d">&nbsp;3×15</span></li>
+        <li><span class="ex-n">14</span><span class="ex-name">Dead Hang</span><span class="ex-d">&nbsp;2×20s</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- C -->
+  <div class="sc">
+    <div class="sc-head">
+      <div class="sc-row"><div class="sc-letter">C</div><div><div class="sc-day">Monday · Week B</div><div class="sc-focus">Full Body Power · ~55 min</div></div></div>
+      <div class="sc-tag">Warm-up: Clamshell · Carry: after SS1 + pre-finisher</div>
+    </div>
+    <div class="sc-body">
+      <ul class="ex-list"><li><span class="ex-n">1</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;2×100</span></li></ul>
+      <div class="ss-lbl">SS1</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">2</span><span class="ex-name">Pull-Ups</span><span class="ex-d">&nbsp;3×max (3-sec eccentric · C: 5/4/3)</span></li>
+        <li><span class="ex-n">3</span><span class="ex-name">Deadbug</span><span class="ex-d">&nbsp;3×12/side</span></li>
+        <li><span class="ex-n">4</span><span class="ex-name">Lateral Lunge</span><span class="ex-d">&nbsp;3×10/side BW</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl">SS2</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">5</span><span class="ex-name">Bulgarian Split Squat</span><span class="ex-d">&nbsp;3×10/leg @10lbs/hand</span></li>
+        <li><span class="ex-n">6</span><span class="ex-name">DB Swing</span><span class="ex-d">&nbsp;3×15–20 @50lbs</span></li>
+        <li><span class="ex-n">7</span><span class="ex-name">Bicycle Crunches</span><span class="ex-d">&nbsp;3×20/side</span></li>
+      </ul>
+      <div class="ss-lbl">SS3</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">8</span><span class="ex-name">Double DB OHP</span><span class="ex-d">&nbsp;3×8–10 @30lbs/arm</span></li>
+        <li><span class="ex-n">9</span><span class="ex-name">Isometric Row Hold</span><span class="ex-d">&nbsp;3×10/side @45lbs · 3-sec pause at chest</span></li>
+        <li><span class="ex-n">10</span><span class="ex-name">Goblet Squat</span><span class="ex-d">&nbsp;3×10 @50lbs</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl fin-lbl">Finisher</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">11</span><span class="ex-name">Crunches</span><span class="ex-d">&nbsp;3×30 · pillow under lower back</span></li>
+        <li><span class="ex-n">12</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;3×100</span></li>
+      </ul>
+      <div class="ss-lbl cor-lbl">Corrective</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">13</span><span class="ex-name">Prone Y Raise</span><span class="ex-d">&nbsp;3×12 @5lbs/arm</span></li>
+        <li><span class="ex-n">14</span><span class="ex-name">Dead Hang</span><span class="ex-d">&nbsp;3×30s</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- D -->
+  <div class="sc">
+    <div class="sc-head">
+      <div class="sc-row"><div class="sc-letter">D</div><div><div class="sc-day">Tuesday · Week B</div><div class="sc-focus">Post Chain + Upper · ~55 min</div></div></div>
+      <div class="sc-tag">Warm-up: Donkey Kick · +Spinal stretch (Tue) · Carry: after SS1 only</div>
+    </div>
+    <div class="sc-body">
+      <ul class="ex-list"><li><span class="ex-n">1</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;2×100</span></li></ul>
+      <div class="ss-lbl">SS1</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">2</span><span class="ex-name">Incline Push-Up</span><span class="ex-d">&nbsp;3×12–15</span></li>
+        <li><span class="ex-n">3</span><span class="ex-name">Deadbug</span><span class="ex-d">&nbsp;3×12/side</span></li>
+        <li><span class="ex-n">4</span><span class="ex-name">Copenhagen Plank</span><span class="ex-d">&nbsp;3×20s/side · knee on bench + active upward drive · left knee more sensitive</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl">SS2</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">5</span><span class="ex-name">Double DB RDL</span><span class="ex-d">&nbsp;3×8–10 @55lbs/arm</span></li>
+        <li><span class="ex-n">6</span><span class="ex-name">Single Arm DB Row</span><span class="ex-d">&nbsp;3×10/side @50lbs</span></li>
+        <li><span class="ex-n">7</span><span class="ex-name">Double DB Front Squat</span><span class="ex-d">&nbsp;3×8–10 @40lbs/arm</span></li>
+      </ul>
+      <div class="ss-lbl">SS3</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">8</span><span class="ex-name">Renegade Row</span><span class="ex-d">&nbsp;3×8/side @30lbs/arm</span></li>
+        <li><span class="ex-n">9</span><span class="ex-name">Rear Delt Fly</span><span class="ex-d">&nbsp;3×10 @12.5lbs/arm</span></li>
+        <li><span class="ex-n">10</span><span class="ex-name">DB Calf Raise</span><span class="ex-d">&nbsp;3×18 @40lbs/arm</span></li>
+      </ul>
+      <div class="ss-lbl fin-lbl">Finisher</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">11</span><span class="ex-name ex-new">Hollow Body Hold</span><span class="ex-d">&nbsp;3×20–30s · lower back pressed to floor throughout</span></li>
+        <li><span class="ex-n">12</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;3×100</span></li>
+      </ul>
+      <div class="ss-lbl cor-lbl">Corrective</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">13</span><span class="ex-name">Side-Lying Ext Rotation</span><span class="ex-d">&nbsp;3×8 @7.5lbs</span></li>
+        <li><span class="ex-n">14</span><span class="ex-name">Dead Hang</span><span class="ex-d">&nbsp;2×20s</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- E -->
+  <div class="sc">
+    <div class="sc-head">
+      <div class="sc-row"><div class="sc-letter">E</div><div><div class="sc-day">Friday · Week B</div><div class="sc-focus">Power + Pull · ~55 min</div></div></div>
+      <div class="sc-tag">Warm-up: Clamshell · follows Row 5 LSS Thu · Carry: after SS1 + after SS3</div>
+    </div>
+    <div class="sc-body">
+      <ul class="ex-list"><li><span class="ex-n">1</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;2×100</span></li></ul>
+      <div class="ss-lbl">SS1</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">2</span><span class="ex-name">Push-Up</span><span class="ex-d">&nbsp;3×15</span></li>
+        <li><span class="ex-n">3</span><span class="ex-name">Deadbug</span><span class="ex-d">&nbsp;3×12/side</span></li>
+        <li><span class="ex-n">4</span><span class="ex-name">Copenhagen Plank</span><span class="ex-d">&nbsp;3×20s/side · knee on bench + active drive · right knee tolerates better than left</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl">SS2</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">5</span><span class="ex-name">DB Swing</span><span class="ex-d">&nbsp;3×20 @50lbs</span></li>
+        <li><span class="ex-n">6</span><span class="ex-name">Double DB Front Squat</span><span class="ex-d">&nbsp;3×8–10 @40lbs/arm</span></li>
+        <li><span class="ex-n">7</span><span class="ex-name">Bulgarian Split Squat</span><span class="ex-d">&nbsp;3×10/leg @10lbs/hand</span></li>
+      </ul>
+      <div class="ss-lbl">SS3</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">8</span><span class="ex-name">Double DB OHP</span><span class="ex-d">&nbsp;3×8–10 @30lbs/arm</span></li>
+        <li><span class="ex-n">9</span><span class="ex-name">Pull-Ups</span><span class="ex-d">&nbsp;3×max (3-sec eccentric)</span></li>
+        <li><span class="ex-n">10</span><span class="ex-name">Rear Delt Fly</span><span class="ex-d">&nbsp;3×10 @12.5lbs/arm</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl fin-lbl">Finisher</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">11</span><span class="ex-name">Bicycle Crunches</span><span class="ex-d">&nbsp;3×20/side</span></li>
+        <li><span class="ex-n">12</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;3×100</span></li>
+      </ul>
+      <div class="ss-lbl cor-lbl">Corrective</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">13</span><span class="ex-name">Scapular Push-Ups</span><span class="ex-d">&nbsp;3×15</span></li>
+        <li><span class="ex-n">14</span><span class="ex-name">Dead Hang</span><span class="ex-d">&nbsp;2×20s</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- F -->
+  <div class="sc">
+    <div class="sc-head">
+      <div class="sc-row"><div class="sc-letter">F</div><div><div class="sc-day">Saturday · Week B</div><div class="sc-focus">Pull + Recovery · ~50 min</div></div></div>
+      <div class="sc-tag">Warm-up: Donkey Kick · Carry: after SS1 + pre-finisher</div>
+    </div>
+    <div class="sc-body">
+      <ul class="ex-list"><li><span class="ex-n">1</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;2×100</span></li></ul>
+      <div class="ss-lbl">SS1</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">2</span><span class="ex-name">Incline Push-Up</span><span class="ex-d">&nbsp;3×12–15</span></li>
+        <li><span class="ex-n">3</span><span class="ex-name">Deadbug</span><span class="ex-d">&nbsp;3×12/side</span></li>
+        <li><span class="ex-n">4</span><span class="ex-name">SL Glute Bridge Alt</span><span class="ex-d">&nbsp;3×15/side @20lbs</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl">SS2</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">5</span><span class="ex-name">Single Leg RDL</span><span class="ex-d">&nbsp;3×10/side @40lbs/arm</span></li>
+        <li><span class="ex-n">6</span><span class="ex-name">Isometric Row Hold</span><span class="ex-d">&nbsp;3×10/side @45lbs · 3-sec pause at chest</span></li>
+        <li><span class="ex-n">7</span><span class="ex-name">Russian Twist</span><span class="ex-d">&nbsp;3×20/side @22.5lbs</span></li>
+      </ul>
+      <div class="ss-lbl">SS3</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">8</span><span class="ex-name">Renegade Row</span><span class="ex-d">&nbsp;3×8/side @30lbs/arm</span></li>
+        <li><span class="ex-n">9</span><span class="ex-name">Jump Squat</span><span class="ex-d">&nbsp;3×10</span></li>
+        <li><span class="ex-n">10</span><span class="ex-name">Bicep Curl</span><span class="ex-d">&nbsp;3×10 @30lbs/arm</span></li>
+      </ul>
+      <div class="carry">→ Suitcase Carry 30–45s/side @50lbs</div>
+      <div class="ss-lbl fin-lbl">Finisher</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">11</span><span class="ex-name">Bicycle Crunches</span><span class="ex-d">&nbsp;3×20/side</span></li>
+        <li><span class="ex-n">12</span><span class="ex-name">Jump Rope</span><span class="ex-d">&nbsp;3×100</span></li>
+      </ul>
+      <div class="ss-lbl cor-lbl">Corrective</div>
+      <ul class="ex-list">
+        <li><span class="ex-n">13</span><span class="ex-name">Prone Y Raise</span><span class="ex-d">&nbsp;3×12 @5lbs/arm</span></li>
+        <li><span class="ex-n">14</span><span class="ex-name">Dead Hang</span><span class="ex-d">&nbsp;2×20s</span></li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end str-grid -->
+
+<!-- SUNDAY -->
+<div class="sec-title" style="color:var(--stretch);">SUNDAY WEEK A — FULL BODY FLEXIBILITY</div>
+<div class="sec-note">20–25 min · Week A rest day only · Recovery + flexibility progression</div>
+<div class="sun-grid">
+  <div class="phase"><div class="phase-lbl">Phase 1 · Spinal (4 min)</div><ul>
+    <li>Cat-Cow<br><span class="p-time">10 reps @3s each</span></li>
+    <li>Thread the Needle<br><span class="p-time">5 reps/side @3s hold</span></li>
+    <li>Child's Pose + Lateral Reach<br><span class="p-time">30s center · 20s/side</span></li>
+  </ul></div>
+  <div class="phase"><div class="phase-lbl">Phase 2 · Hip Complex (7 min)</div><ul>
+    <li>90/90 Hip Stretch<br><span class="p-time">60s/side</span></li>
+    <li>Pigeon Pose<br><span class="p-time">60s/side</span></li>
+    <li>Cossack Squat Hold<br><span class="p-time">30s/side</span></li>
+    <li>Deep Lunge + Rotation<br><span class="p-time">10 reps/side</span></li>
+  </ul></div>
+  <div class="phase"><div class="phase-lbl">Phase 3 · Posterior Chain (5 min)</div><ul>
+    <li>Standing Forward Fold Dead Hang<br><span class="p-time">60s passive</span></li>
+    <li>Single Leg Forward Fold<br><span class="p-time">45s/side</span></li>
+    <li>Supine Figure-4<br><span class="p-time">60s/side · ACL protection</span></li>
+  </ul></div>
+  <div class="phase"><div class="phase-lbl">Phase 4 · Shoulder + Thoracic (4 min)</div><ul>
+    <li>Doorframe Chest Opener<br><span class="p-time">30s arms at 90°</span></li>
+    <li>Cross-Body Shoulder Stretch<br><span class="p-time">30s/side</span></li>
+    <li>Wall Slide<br><span class="p-time">10 slow reps</span></li>
+    <li>Prone Y-T-W Hold<br><span class="p-time">5 reps each @2s hold</span></li>
+  </ul></div>
+  <div class="phase"><div class="phase-lbl">Phase 5 · Decompression (3 min)</div><ul>
+    <li>Supine Knees-to-Chest<br><span class="p-time">60s · slow rock</span></li>
+    <li>Supine Spinal Twist<br><span class="p-time">45s/side</span></li>
+    <li>Diaphragmatic Breathing<br><span class="p-time">60s · 5 deep belly breaths</span></li>
+  </ul></div>
+</div>
+
+<!-- FREQUENCY -->
+<div class="freq">
+  <h3>Exercise Frequency — Per 2-Week Cycle</h3>
+  <div class="freq-sub">Strength sessions + mini sessions combined · <span class="freq-mini">amber = mini session exercises</span></div>
+  <div class="freq-row"><div class="freq-ct">12×</div><div class="freq-ex">Jump Rope</div></div>
+  <div class="freq-row"><div class="freq-ct">6×</div><div class="freq-ex">Dead Hang · Deadbug</div></div>
+  <div class="freq-row"><div class="freq-ct">5×</div><div class="freq-ex">Bicycle Crunches · <span class="freq-mini">DB Lateral Raise</span></div></div>
+  <div class="freq-row"><div class="freq-ct">4×</div><div class="freq-ex"><span class="freq-mini">Arnold Press · Bicep Curl Ladder · Diamond Push-Up</span></div></div>
+  <div class="freq-row"><div class="freq-ct">3×</div><div class="freq-ex">Bulgarian Split Squat · DB Swing · Double DB OHP · Prone Y Raise · Pull-Ups · Rear Delt Fly · Scapular Push-Ups · SL Glute Bridge Alt / BW</div></div>
+  <div class="freq-row"><div class="freq-ct">2×</div><div class="freq-ex">Bicep Curl · Copenhagen Plank · Crunches · <span class="freq-mini">DB OH Tricep Extension</span> · Double DB Front Squat · Double DB RDL · Goblet Squat · Incline Push-Up · Isometric Row Hold · Push-Up · Renegade Row · Side-Lying Ext Rotation · Single Arm DB Row · Single Leg RDL</div></div>
+  <div class="freq-row"><div class="freq-ct">1×</div><div class="freq-ex">DB Calf Raise · Deadbug — Chest Press Var. · <span class="freq-mini">Hammer Curl</span> · Hollow Body Hold · Isometric Push-Up Hold · Jump Squat · Lateral Lunge · Russian Twist · <span class="freq-mini">SL Glute Bridge BW</span> · Straight Arm DB Pullback</div></div>
+</div>
+
+</div><!-- wrap -->
+</body>
+</html>
